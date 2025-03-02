@@ -35,6 +35,7 @@ public class GatewayConfig {
                 "/api/v1/members/logout", "/api/v1/members/signup",
                 "/oauth2/authorization/**", "/api/v1/profile/**")
             .filters(f -> f.filter((exchange, chain) -> {
+              log.info("Auth-sevice url: {}", notiServiceUrl);
               log.info("Auth service route matched: {}", exchange.getRequest().getURI());
               return chain.filter(exchange);
             }))
@@ -44,10 +45,24 @@ public class GatewayConfig {
         .route("noti-service", r -> r.path("/api/v1/noti")
             .filters(f -> f
                 .filter((exchange, chain) -> {
+                  log.info("noti-service url: {}", notiServiceUrl);
                   log.info("Noti service route matched: {}", exchange.getRequest().getURI());
+
+                  // 모든 헤더 로깅
+                  exchange.getRequest().getHeaders().forEach((key, value) -> {
+                    log.info("Incoming Header - {}: {}", key, value);
+                  });
+
                   return chain.filter(exchange);
                 })
-                .filter(jwtAuthenticationFilter)
+                .filter((exchange, chain) -> {
+                  log.info("Entering JwtAuthenticationFilter");
+                  return jwtAuthenticationFilter.filter(exchange, chain);
+                })
+                .filter((exchange, chain) -> {
+                  log.info("Passed JwtAuthenticationFilter");
+                  return chain.filter(exchange);
+                })
             )
             .uri(notiServiceUrl))
 

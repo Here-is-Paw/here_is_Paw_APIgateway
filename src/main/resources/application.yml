@@ -32,5 +32,8 @@ kafka:
     token-events: token-events  # Kafka 토픽 이름
 logging:
   level:
-    root: info
-    com.ll.apigateway : debug
+    root: INFO
+    com.ll.apigateway: DEBUG
+    com.ll.apigateway.filter: TRACE
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
