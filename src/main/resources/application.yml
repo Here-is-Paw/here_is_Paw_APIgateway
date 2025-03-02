@@ -1,0 +1,36 @@
+server:
+  port: 8001
+spring:
+  application:
+    name: ApiGateway
+  output:
+    ansi:
+      enabled: ALWAYS
+  profiles:
+    active: dev
+    include: secret
+  kafka:
+    bootstrap-servers: 43.203.126.129:19092
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.ll.hereispaw.domain.noti.dto.kafka
+        spring.json.use.type.headers: false
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+#  endpoint:
+#    health:
+#      show-details: always
+
+kafka:
+  topics:
+    token-events: token-events  # Kafka 토픽 이름
+logging:
+  level:
+    root: info
+    com.ll.apigateway : debug
