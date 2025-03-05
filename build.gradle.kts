@@ -33,6 +33,7 @@ dependencies {
     // 로깅
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
 
     //kafka
     implementation("org.springframework.kafka:spring-kafka")
@@ -43,6 +44,8 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
+
+
 
 
 }

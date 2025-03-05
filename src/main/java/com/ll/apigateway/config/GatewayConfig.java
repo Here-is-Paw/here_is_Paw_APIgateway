@@ -13,13 +13,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 public class GatewayConfig {
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-  public GatewayConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-  }
 
   @Value("${services.auth.url}")
   private String authServiceUrl;

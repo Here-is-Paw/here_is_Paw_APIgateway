@@ -1,6 +1,6 @@
 services:
   auth:
-    url: http://localhost:8091  # 인증 서비스 URL
+    url: http://localhost:8091 # 인증 서비스 URL
 #    url: http://localhost:8091  # 인증 서비스 URL
   noti:
     url: http://localhost:8092  # 인증 서비스 URL
