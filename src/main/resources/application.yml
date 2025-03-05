@@ -10,7 +10,7 @@ spring:
     active: dev
     include: secret
   kafka:
-    bootstrap-servers: 43.203.126.129:19092
+    bootstrap-servers: 43.203.223.85:19092
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
