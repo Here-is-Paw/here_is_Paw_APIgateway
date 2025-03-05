@@ -35,14 +35,38 @@ public class GatewayConfig {
                 "/api/v1/members/logout", "/api/v1/members/signup",
                 "/oauth2/authorization/**", "/api/v1/profile/**")
             .filters(f -> f.filter((exchange, chain) -> {
-              log.info("Auth-sevice url: {}", notiServiceUrl);
+              log.info("Auth-sevice url: {}", authServiceUrl);
               log.info("Auth service route matched: {}", exchange.getRequest().getURI());
               return chain.filter(exchange);
             }))
             .uri(authServiceUrl))
 
+        .route("auth-service", r -> r.path("/api/v1/members/**")
+            .filters(f -> f
+                .filter((exchange, chain) -> {
+                  log.info("noti-service url: {}", authServiceUrl);
+                  log.info("Noti service route matched: {}", exchange.getRequest().getURI());
+
+                  // 모든 헤더 로깅
+                  exchange.getRequest().getHeaders().forEach((key, value) -> {
+                    log.info("Incoming Header - {}: {}", key, value);
+                  });
+
+                  return chain.filter(exchange);
+                })
+                .filter((exchange, chain) -> {
+                  log.info("Entering JwtAuthenticationFilter");
+                  return jwtAuthenticationFilter.filter(exchange, chain);
+                })
+                .filter((exchange, chain) -> {
+                  log.info("Passed JwtAuthenticationFilter");
+                  return chain.filter(exchange);
+                })
+            )
+            .uri(authServiceUrl))
+
         // 알림 서비스 라우팅 (토큰 검증 필터 적용)
-        .route("noti-service", r -> r.path("/api/v1/noti")
+        .route("noti-service", r -> r.path("/api/v1/noti/**", "/api/v1/sse/**")
             .filters(f -> f
                 .filter((exchange, chain) -> {
                   log.info("noti-service url: {}", notiServiceUrl);
