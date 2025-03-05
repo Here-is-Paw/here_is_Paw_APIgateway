@@ -52,7 +52,7 @@ class ServiceManager:
         # 특정 이미지 중 <none> 태그가 된 이미지만 정리
 
         # 먼저 이미지 목록 확인
-        cmd_list = "docker images | grep 'here-is-paw/dog_face_compare' | grep '<none>'"
+        cmd_list = "docker images | grep 'here-is-paw/here_is_paw_api_gateway' | grep '<none>'"
         images = self._run_command(cmd_list)
 
         if not images:
@@ -60,7 +60,7 @@ class ServiceManager:
             return
 
         # 이미지 정리
-        cmd_remove = "docker images | grep 'here-is-paw/dog_face_compare' | grep '<none>' | awk '{print $3}' | xargs -r docker rmi"
+        cmd_remove = "docker images | grep 'here-is-paw/here_is_paw_api_gateway' | grep '<none>' | awk '{print $3}' | xargs -r docker rmi"
         output = self._run_command(cmd_remove)
         print("이미지 정리 완료")
 
