@@ -28,7 +28,8 @@ public class JwtAuthenticationFilter implements GatewayFilter {
       "/api/v1/members/signup",
       "/api/v1/profile/",
       "/swagger-ui/index.html",
-      "/api/v1/chat/"
+      "/api/v1/chat/",
+      "/login/oauth2/code/**"
   );
 
   public JwtAuthenticationFilter(JwtService jwtService) {
