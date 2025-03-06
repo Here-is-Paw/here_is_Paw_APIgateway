@@ -21,6 +21,10 @@ public class GatewayConfig {
   @Value("${services.auth.url}")
   private String authServiceUrl;
 
+
+  @Value("${services.post.url}")
+  private String postServiceUrl;
+
   @Value("${services.noti.url}")
   private String notiServiceUrl;
 
@@ -38,62 +42,75 @@ public class GatewayConfig {
             }))
             .uri(authServiceUrl))
 
+//        .route("auth-service", r -> r.path("/api/v1/members/**","/api/v1/mypets/**")
+//            .filters(f -> f
+//                .filter((exchange, chain) -> {
+//                  log.info("noti-service url: {}", authServiceUrl);
+//                  log.info("Noti service route matched: {}", exchange.getRequest().getURI());
+//
+//                  // 모든 헤더 로깅
+//                  exchange.getRequest().getHeaders().forEach((key, value) -> {
+//                    log.info("Incoming Header - {}: {}", key, value);
+//                  });
+//
+//                  return chain.filter(exchange);
+//                })
+//                .filter((exchange, chain) -> {
+//                  log.info("Entering JwtAuthenticationFilter");
+//                  return jwtAuthenticationFilter.filter(exchange, chain);
+//                })
+//                .filter((exchange, chain) -> {
+//                  log.info("Passed JwtAuthenticationFilter");
+//                  return chain.filter(exchange);
+//                })
+//            )
+//            .uri(authServiceUrl))
+
+//        // 알림 서비스 라우팅 (토큰 검증 필터 적용)
+//        .route("noti-service", r -> r.path("/api/v1/noti/**", "/api/v1/sse/**")
+//            .filters(f -> f
+//                .filter((exchange, chain) -> {
+//                  log.info("noti-service url: {}", notiServiceUrl);
+//                  log.info("Noti service route matched: {}", exchange.getRequest().getURI());
+//
+//                  // 모든 헤더 로깅
+//                  exchange.getRequest().getHeaders().forEach((key, value) -> {
+//                    log.info("Incoming Header - {}: {}", key, value);
+//                  });
+//
+//                  return chain.filter(exchange);
+//                })
+//                .filter((exchange, chain) -> {
+//                  log.info("Entering JwtAuthenticationFilter");
+//                  return jwtAuthenticationFilter.filter(exchange, chain);
+//                })
+//                .filter((exchange, chain) -> {
+//                  log.info("Passed JwtAuthenticationFilter");
+//                  return chain.filter(exchange);
+//                })
+//            )
+//            .uri(notiServiceUrl))
+
         .route("auth-service", r -> r.path("/api/v1/members/**","/api/v1/mypets/**")
-            .filters(f -> f
-                .filter((exchange, chain) -> {
-                  log.info("noti-service url: {}", authServiceUrl);
-                  log.info("Noti service route matched: {}", exchange.getRequest().getURI());
-
-                  // 모든 헤더 로깅
-                  exchange.getRequest().getHeaders().forEach((key, value) -> {
-                    log.info("Incoming Header - {}: {}", key, value);
-                  });
-
-                  return chain.filter(exchange);
-                })
-                .filter((exchange, chain) -> {
-                  log.info("Entering JwtAuthenticationFilter");
-                  return jwtAuthenticationFilter.filter(exchange, chain);
-                })
-                .filter((exchange, chain) -> {
-                  log.info("Passed JwtAuthenticationFilter");
-                  return chain.filter(exchange);
-                })
-            )
+            .filters(f -> f.filter(jwtAuthenticationFilter))
             .uri(authServiceUrl))
 
-        // 알림 서비스 라우팅 (토큰 검증 필터 적용)
         .route("noti-service", r -> r.path("/api/v1/noti/**", "/api/v1/sse/**")
-            .filters(f -> f
-                .filter((exchange, chain) -> {
-                  log.info("noti-service url: {}", notiServiceUrl);
-                  log.info("Noti service route matched: {}", exchange.getRequest().getURI());
-
-                  // 모든 헤더 로깅
-                  exchange.getRequest().getHeaders().forEach((key, value) -> {
-                    log.info("Incoming Header - {}: {}", key, value);
-                  });
-
-                  return chain.filter(exchange);
-                })
-                .filter((exchange, chain) -> {
-                  log.info("Entering JwtAuthenticationFilter");
-                  return jwtAuthenticationFilter.filter(exchange, chain);
-                })
-                .filter((exchange, chain) -> {
-                  log.info("Passed JwtAuthenticationFilter");
-                  return chain.filter(exchange);
-                })
-            )
+            .filters(f -> f.filter(jwtAuthenticationFilter))
             .uri(notiServiceUrl))
 
-        // 채팅 서비스 라우팅 (필터 미적용)
-        .route("chat-service", r -> r.path("/api/v1/chat/**")
-            .uri("http://chat-service:8082"))
+        // 기타 서비스 라우팅 (JWT 검증 필터 적용)
+        .route("post-services", r -> r.path("/api/v1/missings/**","/api/v1/finding/**")
+            .filters(f -> f.filter(jwtAuthenticationFilter))
+            .uri(postServiceUrl))
 
-        // Swagger UI
-        .route("swagger-ui", r -> r.path("/swagger-ui/**")
-            .uri("http://api-docs:8083"))
+//        // 채팅 서비스 라우팅 (필터 미적용)
+//        .route("chat-service", r -> r.path("/api/v1/chat/**")
+//            .uri("http://chat-service:8082"))
+//
+//        // Swagger UI
+//        .route("swagger-ui", r -> r.path("/swagger-ui/**")
+//            .uri("http://api-docs:8083"))
 
 //        // 기타 서비스 라우팅 (JWT 검증 필터 적용)
 //        .route("other-services", r -> r.path("/api/**")
