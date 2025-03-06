@@ -38,7 +38,7 @@ public class GatewayConfig {
             }))
             .uri(authServiceUrl))
 
-        .route("auth-service", r -> r.path("/api/v1/members/**")
+        .route("auth-service", r -> r.path("/api/v1/members/**","/api/v1/mypets/**")
             .filters(f -> f
                 .filter((exchange, chain) -> {
                   log.info("noti-service url: {}", authServiceUrl);
