@@ -34,7 +34,7 @@ public class GatewayConfig {
         // 인증 서비스 라우팅 (토큰 검증 필터 미적용)
         .route("auth-service", r -> r.path("/auth/**", "/api/v1/members/login",
                 "/api/v1/members/logout", "/api/v1/members/signup",
-                "/oauth2/authorization/**", "/api/v1/profile/**", "/login/oauth2/code/**")
+                "/oauth2/authorization/**", "/api/v1/profile/**", "/login/oauth2/code/**",)
             .filters(f -> f.filter((exchange, chain) -> {
               log.info("Auth-sevice url: {}", authServiceUrl);
               log.info("Auth service route matched: {}", exchange.getRequest().getURI());
