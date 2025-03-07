@@ -101,7 +101,7 @@ public class GatewayConfig {
             .uri(notiServiceUrl))
 
         .route("post-services-other", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**")
-//            .and().method(HttpMethod.GET)
+            .and().method(HttpMethod.GET)
             .filters(f -> f.filter((exchange, chain) -> {
                 log.info("Auth-sevice url: {}", postServiceUrl);
                 log.info("Auth service route matched: {}", exchange.getRequest().getURI());
