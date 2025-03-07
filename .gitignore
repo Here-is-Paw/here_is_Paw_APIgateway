@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+terraform.tfstate
+terraform.tfstate.backup
+variables.tf
