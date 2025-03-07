@@ -19,9 +19,9 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
     ServerHttpRequest request = exchange.getRequest();
 
-//    log.info("Global Filter - Request URI: {}", request.getURI());
-//    log.info("Global Filter - Request Path: {}", request.getPath());
-//    log.info("Global Filter - Request Method: {}", request.getMethod());
+    log.info("Global Filter - Request URI: {}", request.getURI());
+    log.info("Global Filter - Request Path: {}", request.getPath());
+    log.info("Global Filter - Request Method: {}", request.getMethod());
 
     // 요청 타임스탬프 추가
     ServerHttpRequest mutatedRequest = request.mutate()

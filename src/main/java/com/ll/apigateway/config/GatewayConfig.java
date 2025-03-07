@@ -37,8 +37,8 @@ public class GatewayConfig {
                 "/api/v1/members/logout", "/api/v1/members/signup",
                 "/oauth2/authorization/**", "/api/v1/profile/**", "/login/oauth2/code/**")
             .filters(f -> f.filter((exchange, chain) -> {
-              log.info("Auth-sevice url: {}", authServiceUrl);
-              log.info("Auth service route matched: {}", exchange.getRequest().getURI());
+//              log.info("Auth-sevice url: {}", authServiceUrl);
+//              log.info("Auth service route matched: {}", exchange.getRequest().getURI());
               return chain.filter(exchange);
             }))
             .uri(authServiceUrl))
@@ -101,11 +101,13 @@ public class GatewayConfig {
             .uri(notiServiceUrl))
 
         .route("post-services-other", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**")
-            .and().method(HttpMethod.GET)
+//            .and().method(HttpMethod.GET)
             .filters(f -> f.filter((exchange, chain) -> {
+                log.info("Auth-sevice url: {}", postServiceUrl);
+                log.info("Auth service route matched: {}", exchange.getRequest().getURI());
               return chain.filter(exchange);
             }))
-            .uri(authServiceUrl))
+            .uri(postServiceUrl))
 
         .route("post-services-other", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**")
             .filters(f -> f.filter(jwtAuthenticationFilter))
