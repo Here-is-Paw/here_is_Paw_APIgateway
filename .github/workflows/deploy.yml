@@ -100,10 +100,10 @@ jobs:
       - name: Deploy via SSH
         run: |
           ssh -o StrictHostKeyChecking=no root@110.165.16.61 '
-              mkdir -p /dockerProjects/here_is_paw_msa
-              curl -o /dockerProjects/here_is_paw_msa/zero_downtime_deploy.py https://raw.githubusercontent.com/Here-is-Paw/here_is_Paw_APIgateway/main/infraScript/zero_downtime_deploy.py
-              chmod +x /dockerProjects/here_is_paw_msa/zero_downtime_deploy.py
-              python3 /dockerProjects/here_is_paw_msa/zero_downtime_deploy.py
+              mkdir -p /dockerProjects/here_is_paw_msa/api_gateway
+              curl -o /dockerProjects/here_is_paw_msa/api_gateway/zero_downtime_deploy.py https://raw.githubusercontent.com/Here-is-Paw/here_is_Paw_APIgateway/main/infraScript/zero_downtime_deploy.py
+              chmod +x /dockerProjects/here_is_paw_msa/api_gateway/zero_downtime_deploy.py
+              python3 /dockerProjects/here_is_paw_msa/api_gateway/zero_downtime_deploy.py
               echo "Deployment completed successfully"
               exit
           '
