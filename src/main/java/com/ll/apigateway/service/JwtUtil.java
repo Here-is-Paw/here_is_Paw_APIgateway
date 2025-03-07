@@ -28,17 +28,17 @@ public class JwtUtil {
     this.accessTokenExpirationSeconds = accessTokenExpirationSeconds;
   }
 
-  public String generateToken(Map<String, Object> claims) {
-    long now = System.currentTimeMillis();
-    Date expiryDate = new Date(now + accessTokenExpirationSeconds * 1000);
-
-    return Jwts.builder()
-        .setClaims(claims)
-        .setIssuedAt(new Date(now))
-        .setExpiration(expiryDate)
-        .signWith(secretKey, SignatureAlgorithm.HS512)
-        .compact();
-  }
+//  public String generateToken(Map<String, Object> claims) {
+//    long now = System.currentTimeMillis();
+//    Date expiryDate = new Date(now + accessTokenExpirationSeconds * 1000);
+//
+//    return Jwts.builder()
+//        .setClaims(claims)
+//        .setIssuedAt(new Date(now))
+//        .setExpiration(expiryDate)
+//        .signWith(secretKey, SignatureAlgorithm.HS512)
+//        .compact();
+//  }
 
   public Map<String, Object> parseToken(String token) {
     try {
@@ -56,15 +56,15 @@ public class JwtUtil {
     }
   }
 
-  public boolean validateToken(String token) {
-    try {
-      Jwts.parserBuilder()
-          .setSigningKey(secretKey)
-          .build()
-          .parseClaimsJws(token);
-      return true;
-    } catch (JwtException | IllegalArgumentException e) {
-      return false;
-    }
-  }
+//  public boolean validateToken(String token) {
+//    try {
+//      Jwts.parserBuilder()
+//          .setSigningKey(secretKey)
+//          .build()
+//          .parseClaimsJws(token);
+//      return true;
+//    } catch (JwtException | IllegalArgumentException e) {
+//      return false;
+//    }
+//  }
 }

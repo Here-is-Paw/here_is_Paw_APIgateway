@@ -33,7 +33,8 @@ kafka:
 logging:
   level:
     root: INFO
-    com.ll.apigateway: DEBUG
-    com.ll.apigateway.filter: TRACE
-    org.springframework.web: DEBUG
-    org.springframework.security: DEBUG
+    com.ll.apigateway: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.security.web.server.util: WARN
+    org.springframework.cloud.gateway: INFO
