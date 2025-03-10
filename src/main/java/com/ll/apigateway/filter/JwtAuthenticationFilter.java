@@ -34,7 +34,6 @@ public class JwtAuthenticationFilter implements GatewayFilter {
       "/api/v1/members/token/refresh",
       "/api/v1/profile/",
       "/swagger-ui/index.html",
-      "/api/v1/chat/",
       "/login/oauth2/code/**"
   );
 
@@ -113,6 +112,8 @@ public class JwtAuthenticationFilter implements GatewayFilter {
 
   private Mono<Void> addUserInfoToHeaders(ServerWebExchange exchange, GatewayFilterChain chain,
       LoginUser loginUser) {
+    log.info("Adding user info to headers: {}", loginUser);
+    log.info("Adding user info to headers: {}", loginUser.getId());
     // Kafka 이벤트로 전달할 정보만 헤더에 추가
     ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
         .header("X-User-Id", String.valueOf(loginUser.getId()))

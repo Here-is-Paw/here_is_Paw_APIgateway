@@ -29,6 +29,9 @@ public class GatewayConfig {
   @Value("${services.noti.url}")
   private String notiServiceUrl;
 
+  @Value("${services.chat.url}")
+  private String chatServiceUrl;
+
   @Bean
   public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
     return builder.routes()
@@ -100,18 +103,61 @@ public class GatewayConfig {
             .filters(f -> f.filter(jwtAuthenticationFilter))
             .uri(notiServiceUrl))
 
-        .route("post-services-other", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**")
+        .route("post-services-get", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**")
             .and().method(HttpMethod.GET)
             .filters(f -> f.filter((exchange, chain) -> {
-                log.info("Auth-sevice url: {}", postServiceUrl);
-                log.info("Auth service route matched: {}", exchange.getRequest().getURI());
+              log.info("Auth-sevice url: {}", postServiceUrl);
+              log.info("Auth service route matched: {}", exchange.getRequest().getURI());
               return chain.filter(exchange);
             }))
             .uri(postServiceUrl))
 
-        .route("post-services-other", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**")
+        .route("post-services", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**")
             .filters(f -> f.filter(jwtAuthenticationFilter))
             .uri(postServiceUrl))
+//
+//        .route("chat-services", r -> r.path("/api/v1/chat/**", "/api/v1/finding/**")
+//            .filters(f -> f.filter(jwtAuthenticationFilter))
+//            .uri(chatServiceUrl))
+
+        .route("chat-services", r -> r.path("/api/v1/chat/**", "/api/v1/finding/**")
+            .filters(f -> f
+                .filter((exchange, chain) -> {
+                  log.info("noti-service url: {}", chatServiceUrl);
+                  log.info("Noti service route matched: {}", exchange.getRequest().getURI());
+
+                  // 모든 헤더 로깅
+                  exchange.getRequest().getHeaders().forEach((key, value) -> {
+                    log.info("Incoming Header - {}: {}", key, value);
+                  });
+
+                  return chain.filter(exchange);
+                })
+                .filter((exchange, chain) -> {
+                  log.info("Entering JwtAuthenticationFilter");
+                  return jwtAuthenticationFilter.filter(exchange, chain);
+                })
+                .filter((exchange, chain) -> {
+                  log.info("Passed JwtAuthenticationFilter");
+                  return chain.filter(exchange);
+                })
+            )
+            .uri(chatServiceUrl))
+//        .route("chat-websocket", r -> r.path("/ws/**")
+//            .filters(f -> f.filter((exchange, chain) -> {
+//              log.info("WebSocket 라우트 매치됨: {}", exchange.getRequest().getURI());
+//              exchange.getRequest().getHeaders().forEach((key, value) -> {
+//                log.info("WebSocket 헤더 - {}: {}", key, value);
+//              });
+//              return chain.filter(exchange);
+//            }))
+//            .uri(chatServiceUrl))
+
+        .route("chat-websocket", r -> r.path("/ws/**")
+            .filters(f -> f.setRequestHeader("X-Forwarded-Prefix", "/ws"))
+            .uri(chatServiceUrl))
+//        .route("chat-websocket", r -> r.path("/ws/**")
+//            .uri(chatServiceUrl))
 
 //        // 채팅 서비스 라우팅 (필터 미적용)
 //        .route("chat-service", r -> r.path("/api/v1/chat/**")
