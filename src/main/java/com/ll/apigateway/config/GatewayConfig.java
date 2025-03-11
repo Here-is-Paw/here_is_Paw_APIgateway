@@ -17,31 +17,34 @@ import org.springframework.http.HttpMethod;
 @RequiredArgsConstructor
 public class GatewayConfig {
 
-  private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-  @Value("${services.auth.url}")
-  private String authServiceUrl;
+    @Value("${services.auth.url}")
+    private String authServiceUrl;
 
 
-  @Value("${services.post.url}")
-  private String postServiceUrl;
+    @Value("${services.post.url}")
+    private String postServiceUrl;
 
-  @Value("${services.noti.url}")
-  private String notiServiceUrl;
+    @Value("${services.noti.url}")
+    private String notiServiceUrl;
 
-  @Bean
-  public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
-    return builder.routes()
-        // 인증 서비스 라우팅 (토큰 검증 필터 미적용)
-        .route("auth-service", r -> r.path("/auth/**", "/api/v1/members/login",
-                "/api/v1/members/logout", "/api/v1/members/signup",
-                "/oauth2/authorization/**", "/api/v1/profile/**", "/login/oauth2/code/**")
-            .filters(f -> f.filter((exchange, chain) -> {
+    @Value("${services.search.url}")
+    private String searchServiceUrl;
+
+    @Bean
+    public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+        return builder.routes()
+                // 인증 서비스 라우팅 (토큰 검증 필터 미적용)
+                .route("auth-service", r -> r.path("/auth/**", "/api/v1/members/login",
+                                "/api/v1/members/logout", "/api/v1/members/signup",
+                                "/oauth2/authorization/**", "/api/v1/profile/**", "/login/oauth2/code/**")
+                        .filters(f -> f.filter((exchange, chain) -> {
 //              log.info("Auth-sevice url: {}", authServiceUrl);
 //              log.info("Auth service route matched: {}", exchange.getRequest().getURI());
-              return chain.filter(exchange);
-            }))
-            .uri(authServiceUrl))
+                            return chain.filter(exchange);
+                        }))
+                        .uri(authServiceUrl))
 
 //        .route("auth-service", r -> r.path("/api/v1/members/**","/api/v1/mypets/**")
 //            .filters(f -> f
@@ -92,26 +95,36 @@ public class GatewayConfig {
 //            )
 //            .uri(notiServiceUrl))
 
-        .route("auth-service", r -> r.path("/api/v1/members/**", "/api/v1/mypets/**")
-            .filters(f -> f.filter(jwtAuthenticationFilter))
-            .uri(authServiceUrl))
+                .route("auth-service", r -> r.path("/api/v1/members/**", "/api/v1/mypets/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri(authServiceUrl))
 
-        .route("noti-service", r -> r.path("/api/v1/noti/**", "/api/v1/sse/**")
-            .filters(f -> f.filter(jwtAuthenticationFilter))
-            .uri(notiServiceUrl))
+                .route("noti-service", r -> r.path("/api/v1/noti/**", "/api/v1/sse/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri(notiServiceUrl))
 
-        .route("post-services-other", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**")
-            .and().method(HttpMethod.GET)
-            .filters(f -> f.filter((exchange, chain) -> {
-                log.info("Auth-sevice url: {}", postServiceUrl);
-                log.info("Auth service route matched: {}", exchange.getRequest().getURI());
-              return chain.filter(exchange);
-            }))
-            .uri(postServiceUrl))
+                .route("post-services-get", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**")
+                        .and().method(HttpMethod.GET)
+                        .filters(f -> f.filter((exchange, chain) -> {
+                            log.info("Auth-sevice url: {}", postServiceUrl);
+                            log.info("Auth service route matched: {}", exchange.getRequest().getURI());
+                            return chain.filter(exchange);
+                        }))
+                        .uri(postServiceUrl))
 
-        .route("post-services-other", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**")
-            .filters(f -> f.filter(jwtAuthenticationFilter))
-            .uri(postServiceUrl))
+                .route("post-services-other", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri(postServiceUrl))
+
+                .route("post-services-user", r -> r.path("/api/v1/userPosts/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri(postServiceUrl))
+
+                .route("search-services", r -> r.path("/api/v1/searchPost/**", "/api/v1/searchMember/**")
+                        .filters(f -> f.filter((exchange, chain) -> {
+                            return chain.filter(exchange);
+                        }))
+                        .uri(searchServiceUrl))
 
 //        // 채팅 서비스 라우팅 (필터 미적용)
 //        .route("chat-service", r -> r.path("/api/v1/chat/**")
@@ -126,6 +139,6 @@ public class GatewayConfig {
 //            .filters(f -> f.filter(jwtAuthenticationFilter))
 //            .uri("http://service-routing:8084"))
 
-        .build();
-  }
+                .build();
+    }
 }
