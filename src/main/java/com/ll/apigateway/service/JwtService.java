@@ -26,8 +26,8 @@ public class JwtService {
   @Value("${services.auth.url}")
   private String authServiceUrl;
 
-  @Value("${kafka.topics.token-events}")
-  private String tokenEventsTopic;
+//  @Value("${kafka.topics.token-events}")
+//  private String tokenEventsTopic;
 
   public Map<String, Object> validateAndParseToken(String token) {
     return jwtUtil.parseToken(token);

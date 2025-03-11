@@ -26,10 +26,6 @@ spring:
 #  endpoint:
 #    health:
 #      show-details: always
-
-kafka:
-  topics:
-    token-events: token-events  # Kafka 토픽 이름
 logging:
   level:
     root: INFO
