@@ -13,6 +13,6 @@ services:
   noti:
     url: http://110.165.16.61:8097  # 알림 서비스 URL
   payment:
-    url: http://110.165.16.61:8099 # 결제 서비스 URL
+    url: http://110.165.16.61:8100 # 결제 서비스 URL
   search:
     url: http://110.165.16.61:8060  # 인증 서비스 URL

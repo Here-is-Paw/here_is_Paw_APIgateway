@@ -8,6 +8,6 @@ services:
   noti:
     url: http://localhost:8097  # 알림 서비스 URL
   payment:
-    url: http://localhost:8099 # 결제 서비스 URL
+    url: http://localhost:8100 # 결제 서비스 URL
   search:
     url: http://localhost:8060
