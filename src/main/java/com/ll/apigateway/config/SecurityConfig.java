@@ -53,7 +53,6 @@ public class SecurityConfig {
                 "/api/v1/members/signup",
                 "/api/v1/members/me",
                 "/api/v1/profile/**",
-                "/swagger-ui/**",
                 "/h2-console/**",
                 "/oauth2/authorization/**",
                 "/api/v1/chat/**"

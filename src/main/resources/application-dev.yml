@@ -10,4 +10,6 @@ services:
   payment:
     url: http://localhost:8100 # 결제 서비스 URL
   search:
-    url: http://localhost:8060
+    url: http://localhost:8103 # 검색 서비스 URL
+  carecenter:
+    url: http://localhost:8105 # 병원 서비스 URL

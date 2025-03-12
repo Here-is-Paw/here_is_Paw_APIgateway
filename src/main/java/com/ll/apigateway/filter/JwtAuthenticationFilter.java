@@ -31,7 +31,6 @@ public class JwtAuthenticationFilter implements GatewayFilter {
       "/api/v1/members/logout",
       "/api/v1/members/signup",
       "/api/v1/members/token/refresh", // 토큰 재발급 엔드포인트 추가
-      "/api/v1/members/token/refresh",
       "/api/v1/profile/",
       "/swagger-ui/index.html",
       "/login/oauth2/code/**"

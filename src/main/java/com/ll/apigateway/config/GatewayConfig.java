@@ -37,6 +37,9 @@ public class GatewayConfig {
     @Value("${services.search.url}")
     private String searchServiceUrl;
 
+    @Value("${services.carecenter.url}")
+    private String carecenterServiceUrl;
+
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
@@ -48,7 +51,6 @@ public class GatewayConfig {
                             return chain.filter(exchange);
                         }))
                         .uri(authServiceUrl))
-
                 .route("auth-service", r -> r.path("/api/v1/members/**", "/api/v1/mypets/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri(authServiceUrl))
@@ -65,17 +67,13 @@ public class GatewayConfig {
                             return chain.filter(exchange);
                         }))
                         .uri(postServiceUrl))
+                .route("post-services", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**","/api/v1/userPosts/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri(postServiceUrl))
 
-                .route("post-services", r -> r.path("/api/v1/missings/**", "/api/v1/finding/**")
-                        .filters(f -> f.filter(jwtAuthenticationFilter))
-                        .uri(postServiceUrl))
-                .route("post-services-user", r -> r.path("/api/v1/userPosts/**")
-                        .filters(f -> f.filter(jwtAuthenticationFilter))
-                        .uri(postServiceUrl))
                 .route("chat-services", r -> r.path("/api/v1/chat/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri(chatServiceUrl))
-
                 .route("chat-websocket", r -> r.path("/ws/**")
                         .filters(f -> f.setRequestHeader("X-Forwarded-Prefix", "/ws"))
                         .uri(chatServiceUrl))
@@ -89,6 +87,13 @@ public class GatewayConfig {
                             return chain.filter(exchange);
                         }))
                         .uri(searchServiceUrl))
+
+                .route("carecenter-service", r -> r.path( "/api/v1/care-center")
+                    .filters(f -> f.filter((exchange, chain) -> {
+                        return chain.filter(exchange);
+                    }))
+                    .uri(carecenterServiceUrl))
+
                 .build();
     }
 }
