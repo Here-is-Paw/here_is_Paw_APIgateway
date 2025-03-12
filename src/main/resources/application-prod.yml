@@ -5,7 +5,7 @@ custom:
     expirationSeconds: "#{60*15}"
 services:
   auth:
-    url: http://110.165.16.61:8090  # 인증 서비스 URL
+    url: http://110.165.16.61:8090 # 인증 서비스 URL
   post:
     url: http://110.165.16.61:8093  # 게시글 서비스 URL
   chat:
@@ -14,5 +14,5 @@ services:
     url: http://110.165.16.61:8097  # 알림 서비스 URL
   payment:
     url: http://110.165.16.61:8099 # 결제 서비스 URL
-  search:
-    url: http://110.165.16.61:8060  # 인증 서비스 URL
+  carecenter:
+    url: http://110.165.16.61:8101 # 병원 서비스 URL
