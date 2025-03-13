@@ -88,7 +88,7 @@ public class GatewayConfig {
                         }))
                         .uri(searchServiceUrl))
 
-                .route("carecenter-service", r -> r.path( "/api/v1/care-center")
+                .route("carecenter-service", r -> r.path( "/api/v1/care-center/**")
                     .filters(f -> f.filter((exchange, chain) -> {
                         return chain.filter(exchange);
                     }))
