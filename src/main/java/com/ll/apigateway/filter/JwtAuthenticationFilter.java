@@ -8,24 +8,32 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter implements GatewayFilter {
 
+  @Value("${services.auth.url}")
+  private String memberServiceUrl;
+
   private final JwtService jwtService;
+  private final WebClient.Builder webClientBuilder;
   private final List<String> excludedPaths = List.of(
       "/api/v1/members/login",
       "/api/v1/members/logout",
@@ -36,9 +44,9 @@ public class JwtAuthenticationFilter implements GatewayFilter {
       "/login/oauth2/code/**"
   );
 
-  public JwtAuthenticationFilter(JwtService jwtService) {
-    this.jwtService = jwtService;
-  }
+//  public JwtAuthenticationFilter(JwtService jwtService) {
+//    this.jwtService = jwtService;
+//  }
 
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -77,37 +85,92 @@ public class JwtAuthenticationFilter implements GatewayFilter {
           return addUserInfoToHeaders(exchange, chain, loginUser);
         }
       } catch (Exception e) {
-        // 토큰이 유효하지 않고 API 키가 있는 경우 토큰 재발급 요청으로 리다이렉트
+        // 토큰이 유효하지 않고 API 키가 있는 경우 토큰 재발급 진행
         if (apiKey.isPresent()) {
-          return redirectToTokenRefresh(exchange, apiKey.get());
+          return refreshTokenAndContinue(exchange, chain, apiKey.get());
         }
         return onError(exchange, "Invalid authentication token", HttpStatus.UNAUTHORIZED);
       }
     }
 
-    // 토큰이 없지만 API 키가 있는 경우 토큰 재발급 요청으로 리다이렉트
+    // 토큰이 없지만 API 키가 있는 경우 토큰 재발급 진행
     if (apiKey.isPresent()) {
-      return redirectToTokenRefresh(exchange, apiKey.get());
+      return refreshTokenAndContinue(exchange, chain, apiKey.get());
     }
 
     return onError(exchange, "Invalid authentication token", HttpStatus.UNAUTHORIZED);
   }
 
-  private Mono<Void> redirectToTokenRefresh(ServerWebExchange exchange, String apiKey) {
-    // Member 서비스의 토큰 재발급 엔드포인트로 리다이렉트
+  private Mono<Void> refreshTokenAndContinue(ServerWebExchange exchange, GatewayFilterChain chain, String apiKey) {
+    ServerHttpRequest originalRequest = exchange.getRequest();
+    URI originalUri = originalRequest.getURI();
+    String originalPath = originalUri.getPath();
+    String originalQuery = originalUri.getQuery() != null ? "?" + originalUri.getQuery() : "";
+
+    // 토큰 리프레시 후 원래 URL로 리다이렉트하도록 파라미터 추가
     URI tokenRefreshUri = UriComponentsBuilder
         .fromUriString("/api/v1/members/token/refresh")
         .queryParam("apiKey", apiKey)
+        .queryParam("redirectUri", originalPath + originalQuery)
         .build()
         .toUri();
 
     ServerHttpResponse response = exchange.getResponse();
-    response.setStatusCode(HttpStatus.TEMPORARY_REDIRECT);
+    response.setStatusCode(HttpStatus.SEE_OTHER);  // 303 리다이렉트는 GET 메서드를 강제함
     response.getHeaders().set(HttpHeaders.LOCATION, tokenRefreshUri.toString());
 
-    log.info("Redirecting to token refresh endpoint: {}", tokenRefreshUri);
+    log.info("Redirecting to token refresh endpoint: {} with redirect back to {}",
+        tokenRefreshUri, originalPath + originalQuery);
     return response.setComplete();
   }
+//
+//  private Mono<Void> refreshTokenAndContinue(ServerWebExchange exchange, GatewayFilterChain chain, String apiKey) {
+//    ServerHttpRequest originalRequest = exchange.getRequest();
+//    URI originalUri = originalRequest.getURI();
+//
+//    log.info("Refreshing token for API key: {}", apiKey);
+//
+//    // WebClient를 사용하여 토큰 리프레시 요청
+//    return webClientBuilder.build()
+//        .get()
+//        .uri(memberServiceUrl + "/api/v1/members/token/refresh?apiKey=" + apiKey)
+//        .retrieve()
+//        .bodyToMono(Map.class)
+//        .flatMap(responseBody -> {
+//          log.info("Token refresh response: {}", responseBody);
+//          String newAccessToken = (String) responseBody.get("accessToken");
+//
+//          if (newAccessToken != null) {
+//            // 원래 요청에 새 토큰 추가
+//            ServerHttpRequest newRequest = originalRequest.mutate()
+//                .header("Authorization", "Bearer " + apiKey + " " + newAccessToken)
+//                .build();
+//
+//            // 쿠키 설정
+//            ServerHttpResponse response = exchange.getResponse();
+//            ResponseCookie cookie = ResponseCookie.from("accessToken", newAccessToken)
+//                .path("/")
+//                .maxAge(3600)
+//                .httpOnly(true)
+//                .build();
+//            response.getHeaders().add(HttpHeaders.SET_COOKIE, cookie.toString());
+//
+//            // 새 요청으로 교환 업데이트
+//            ServerWebExchange newExchange = exchange.mutate()
+//                .request(newRequest)
+//                .build();
+//
+//            // 원래 체인으로 계속 진행
+//            return chain.filter(newExchange);
+//          }
+//
+//          return onError(exchange, "Failed to refresh token", HttpStatus.UNAUTHORIZED);
+//        })
+//        .onErrorResume(e -> {
+//          log.error("Error refreshing token", e);
+//          return onError(exchange, "Error refreshing token: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
+//        });
+//  }
 
   private Mono<Void> addUserInfoToHeaders(ServerWebExchange exchange, GatewayFilterChain chain,
       LoginUser loginUser) {
