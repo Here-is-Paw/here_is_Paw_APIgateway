@@ -101,28 +101,59 @@ public class JwtAuthenticationFilter implements GatewayFilter {
     return onError(exchange, "Invalid authentication token", HttpStatus.UNAUTHORIZED);
   }
 
+//  private Mono<Void> refreshTokenAndContinue(ServerWebExchange exchange, GatewayFilterChain chain, String apiKey) {
+//    ServerHttpRequest originalRequest = exchange.getRequest();
+//    URI originalUri = originalRequest.getURI();
+//    String originalPath = originalUri.getPath();
+//    String originalQuery = originalUri.getQuery() != null ? "?" + originalUri.getQuery() : "";
+//
+//    // 토큰 리프레시 후 원래 URL로 리다이렉트하도록 파라미터 추가
+//    URI tokenRefreshUri = UriComponentsBuilder
+//        .fromUriString("/api/v1/members/token/refresh")
+//        .queryParam("apiKey", apiKey)
+//        .queryParam("redirectUri", originalPath + originalQuery)
+//        .build()
+//        .toUri();
+//
+//    ServerHttpResponse response = exchange.getResponse();
+//    response.setStatusCode(HttpStatus.SEE_OTHER);  // 303 리다이렉트는 GET 메서드를 강제함
+//    response.getHeaders().set(HttpHeaders.LOCATION, tokenRefreshUri.toString());
+//
+//    log.info("Redirecting to token refresh endpoint: {} with redirect back to {}",
+//        tokenRefreshUri, originalPath + originalQuery);
+//    return response.setComplete();
+//  }
+
   private Mono<Void> refreshTokenAndContinue(ServerWebExchange exchange, GatewayFilterChain chain, String apiKey) {
     ServerHttpRequest originalRequest = exchange.getRequest();
     URI originalUri = originalRequest.getURI();
     String originalPath = originalUri.getPath();
     String originalQuery = originalUri.getQuery() != null ? "?" + originalUri.getQuery() : "";
 
-    // 토큰 리프레시 후 원래 URL로 리다이렉트하도록 파라미터 추가
-    URI tokenRefreshUri = UriComponentsBuilder
+    // Extract connection ID if present
+    String connectionId = originalRequest.getHeaders().getFirst("X-Connection-ID");
+
+    // Build redirect URI with connection ID if available
+    UriComponentsBuilder builder = UriComponentsBuilder
         .fromUriString("/api/v1/members/token/refresh")
         .queryParam("apiKey", apiKey)
-        .queryParam("redirectUri", originalPath + originalQuery)
-        .build()
-        .toUri();
+        .queryParam("redirectUri", originalPath + originalQuery);
+
+    if (connectionId != null && !connectionId.isEmpty()) {
+      builder.queryParam("connectionId", connectionId);
+    }
+
+    URI tokenRefreshUri = builder.build().toUri();
 
     ServerHttpResponse response = exchange.getResponse();
-    response.setStatusCode(HttpStatus.SEE_OTHER);  // 303 리다이렉트는 GET 메서드를 강제함
+    response.setStatusCode(HttpStatus.SEE_OTHER);
     response.getHeaders().set(HttpHeaders.LOCATION, tokenRefreshUri.toString());
 
     log.info("Redirecting to token refresh endpoint: {} with redirect back to {}",
         tokenRefreshUri, originalPath + originalQuery);
     return response.setComplete();
   }
+
 //
 //  private Mono<Void> refreshTokenAndContinue(ServerWebExchange exchange, GatewayFilterChain chain, String apiKey) {
 //    ServerHttpRequest originalRequest = exchange.getRequest();

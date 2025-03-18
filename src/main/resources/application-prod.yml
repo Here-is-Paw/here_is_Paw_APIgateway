@@ -1,15 +1,15 @@
 services:
   auth:
-    url: http://110.165.16.61:8090 # 인증 서비스 URL
+    url: http://172.30.1.23:8090 # 인증 서비스 URL
   post:
-    url: http://110.165.16.61:8093  # 게시글 서비스 URL
+    url: http://172.30.1.23:8093  # 게시글 서비스 URL
   chat:
-    url: http://110.165.16.61:8095  # 채팅 서비스 URL
+    url: http://172.30.1.23:8095  # 채팅 서비스 URL
   noti:
-    url: http://110.165.16.61:8097  # 알림 서비스 URL
+    url: http://172.30.1.23:8097  # 알림 서비스 URL
   payment:
-    url: http://110.165.16.61:8100 # 결제 서비스 URL
+    url: http://172.30.1.23:8100 # 결제 서비스 URL
   search:
-    url: http://110.165.16.61:8103  # 검색 서비스 URL
+    url: http://172.30.1.23:8103  # 검색 서비스 URL
   carecenter:
-    url: http://110.165.16.61:8105 # 병원 서비스 URL
+    url: http://172.30.1.23:8105 # 병원 서비스 URL
